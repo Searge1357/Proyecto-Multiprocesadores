@@ -1,3 +1,4 @@
+#pragma warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
 #include <intrin.h>
@@ -29,38 +30,13 @@ int main() {
 	double* ptrA;
 	double* ptrB;
 	double* ptrB_aux;
-	FILE* of_A;
+	/*FILE* of_A;
 	FILE* of_B;
 	FILE* of_C;
 	errno_t err;
-	long double x;
+	long double x;*/
 
-	/Open files/
-	err = fopen_s(&of_A, "matrixA2500.txt", "r");
-	if (err == 0)
-	{
-		printf("The file 'matrixA2500.txt' was opened\n");
-		fread_s(&x, sizeof(long double), sizeof(long double), 1, of_A);
-		printf("%lf\n", x);
-	}
-	else
-	{
-		printf("The file 'matrixA2500.txt' was not opened\n");
-		exit(EXIT_FAILURE);
-	}
-
-	err = fopen_s(&of_B, "matrixB2500.txt", "r");
-	if (err == 0)
-	{
-		printf("The file 'matrixB2500.txt' was opened\n");
-	}
-	else
-	{
-		printf("The file 'matrixB2500.txt' was not opened\n");
-		exit(EXIT_FAILURE);
-	}
-
-	/SET ARRAYS SIZES/
+	//SET ARRAYS SIZES /
 	printf("Enter size of rows and columns for array A: ");
 	scanf_s("%d %d", &arrA.rows, &arrA.columns);
 
@@ -72,56 +48,84 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
+	//Open files 
+
+	FILE* FileA = fopen("matrixA2500.txt", "r");
+	FILE* FileB = fopen("matrixB2500.txt", "r");
+	if (FileA == NULL) {
+		printf("File A does not exist.");
+		return 0;
+	}
+	if (FileB == NULL) {
+		printf("File B does not exist.");
+		return 0;
+	}
+
+
 	//CHECK IF MEMORY HAS BEEN ALLOCATED
 	ptrA = (double*)malloc(((double)arrA.columns * arrA.rows) * sizeof(double));
 	ptrB = (double*)malloc(((double)arrB.columns * arrB.rows) * sizeof(double));
 	ptrB_aux = (double*)malloc(((double)arrB.columns * arrB.rows) * sizeof(double));
-	//printf("0x%x\n", &ptrA);
-	/FILL ARRAYS  WITH INPUT FILE DATA/
+
+	// FILL ARRAYS  WITH INPUT FILE DATA /
+	//Array A
 	if (ptrA == NULL) {
 		printf("Memory not allocated.\n");
 		exit(0);
 	}
 	else {
-		int bufferA_size = arrA.columns * arrA.rows * sizeof(double);
 		int elementA_count = arrA.columns * arrA.rows;
-		//num_readA = fread_s(ptrA, bufferA_size, sizeof(double), elementA_count, of_A);
-
-		////for (int i = 0; i < elementA_count; i++) {
-		//fread_s(&x, sizeof(double), sizeof(double), 1, of_A);
-		//printf("%lf\n", x);
-		//}
+		int i = 0;
+		while (i < elementA_count) {
+			if (feof(FileA)) {
+				printf("Se llego al final del archivo");
+				return 0;
+			}
+			fscanf(FileA, "%lf ", &ptrA[i]); //LLena la matriz con todos los valores
+			i++;
+		}
 	}
 
+	//Array B
 	if (ptrB == NULL) {
 		printf("Memory not allocated.\n");
 		exit(0);
 	}
 	else {
-		for (int i = 0; i < arrB.columns * arrB.rows; i++)
-			ptrB[i] = (double)i + 1;
-	}
-
-	////PRINT VALUES INSIDE ARRAYS
-	if (ptrA) {
-		for (int i = 0; i < arrA.rows; i++) {
-			for (int j = 0; j < arrA.columns; j++) {
-				printf("%lf \t", ptrA[i * arrA.columns + j ]);
+		int elementB_count = arrB.columns * arrB.rows;
+		int i = 0;
+		while (i < elementB_count) {
+			if (feof(FileB)) {
+				printf("Se llego al final del archivo");
+				return 0;
 			}
-			printf("\n");
+			fscanf(FileB, "%lf ", &ptrB[i]); //LLena la matriz con todos los valores
+			i++;
 		}
 	}
 
+
+
+	////PRINT VALUES INSIDE ARRAYS
+	/*if (ptrA) {
+		for (int i = 0; i < arrA.rows; i++) {
+			for (int j = 0; j < arrA.columns; j++) {
+				printf("%0.12f \t", ptrA[i * arrA.columns + j]);
+			}
+			printf("\n");
+		}
+	}*/
+
 	//printf("\n\n");
 
-	//if (ptrB) {
-	//	for (int i = 0; i < arrB.rows; i++) {
-	//		for (int j = 0; j < arrB.columns; j++) {
-	//			printf("%lf \t", ptrB[i * arrB.columns + j]);
-	//		}
-	//		printf("\n");
-	//	}
-	//}
+	/*if (ptrB) {
+		for (int i = 0; i < arrB.rows; i++) {
+			for (int j = 0; j < arrB.columns; j++) {
+				printf("%0.12f \n", ptrB[i * arrB.columns + j]);
+			}
+			printf("\n");
+		}
+	}*/
 
 	free(ptrA);
 	free(ptrB);
