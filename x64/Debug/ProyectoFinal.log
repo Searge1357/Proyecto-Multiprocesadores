@@ -1,0 +1,8 @@
+﻿  Source.c
+C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\Source.c(66,60): warning C4244: 'función': conversión de 'double' a 'size_t'; posible pérdida de datos
+C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\Source.c(67,60): warning C4244: 'función': conversión de 'double' a 'size_t'; posible pérdida de datos
+C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\Source.c(68,64): warning C4244: 'función': conversión de 'double' a 'size_t'; posible pérdida de datos
+C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\Source.c(28,6): warning C4101: 'num_readA': variable local sin referencia
+C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\Source.c(29,26): warning C4101: 'arrC': variable local sin referencia
+C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\Source.c(28,17): warning C4101: 'num_readB': variable local sin referencia
+  ProyectoFinal.vcxproj -> C:\Users\sergi\OneDrive\Escritorio\Noveno semestre\Multiprocesadores\ProyectoFinal\x64\Debug\ProyectoFinal.exe
