@@ -1,7 +1,6 @@
 #pragma warning(disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
-#include <intrin.h>
 
 struct arrs
 {
@@ -15,38 +14,33 @@ struct arrs
 	- ARR: LONG DOUBLE POINTER THAT POINTS TO ARRAY HOLDING ELEMENTS READ FROM INPUT FILE
 */
 double long* matrixTransposition(struct arrs arrB, long double* arr) {
-	long double* aux_arr;
+	long double* new_arr;
+	//long double* aux_arr;
 	int arrSize = arrB.rows * arrB.columns;
-	aux_arr = (long double*)malloc(sizeof(long double) * arrSize);
+	new_arr = (long double*)_aligned_malloc(sizeof(long double) * arrSize, sizeof(long double));
+	//aux_arr = (long double*)malloc(sizeof(long double) * arrB.columns);
 
-	/CHECK IF MEMORY ALLOCATED/
-	if (aux_arr == NULL) {
+	//CHECK IF MEMORY ALLOCATED/
+	if (new_arr == NULL) {
 		printf("Memory no allocated");
 		exit(EXIT_FAILURE);
 	}
+	/*if (aux_arr == NULL) {
+		printf("Memory no allocated");
+		exit(EXIT_FAILURE);
+	}*/
 	else {
-		/TRANSPOSITION SECTION/
+		//TRANSPOSITION SECTION/
 		for (int i = 0; i < arrB.rows; i++) {
 			for (int j = 0; j < arrB.columns; j++) {
-				aux_arr[i * arrB.columns + j] = arr[(j*arrB.columns) + i];
+				new_arr[j * arrB.rows + i] = arr[i * arrB.columns + j];
 			}
 		}
 	}
+	printf("\n");
 
-	/PRINT AUX_ARR ELEMENTS/
-	//if (aux_arr) {
-	//	for (int i = 0; i < arrB.columns; i++) {
-	//		for (int j = 0; j < arrB.rows; j++) {
-	//			printf("%0.12f  \t", aux_arr[i * arrB.columns + j]);
-	//		}
-	//		printf("\n");
-	//	}
-	//}
-	//printf("\n");
-
-	return aux_arr;
+	return new_arr;
 }
-
 int main() {
 	//siempre alinear los arreglos
 
@@ -55,6 +49,7 @@ int main() {
 	long double* ptrA;
 	long double* ptrB;
 	long double* ptrB_aux;
+	long double* ptrC;
 
 	//SET ARRAYS SIZES /
 	printf("Enter size of rows and columns for array A: ");
@@ -63,14 +58,17 @@ int main() {
 	printf("Enter size of rows and columns for array B: ");
 	scanf_s("%d %d", &arrB.rows, &arrB.columns);
 
+	arrC.columns = arrB.columns;
+	arrC.rows = arrA.rows;
+
 	if (arrA.columns != arrB.rows) {
 		printf("\nNUMBER OF COLUMNS AND ROWS DOES NOT MATCH!! TRY AGAIN \n");
 		exit(EXIT_FAILURE);
 	}
 
 	//OPEN FILES
-	FILE* FileA = fopen("matrixA2500.txt", "r");
-	FILE* FileB = fopen("matrixB2500.txt", "r");
+	FILE* FileA = fopen("matrizA.txt", "r");
+	FILE* FileB = fopen("matrizB.txt", "r");
 	if (FileA == NULL) {
 		printf("File A does not exist.");
 		return 0;
@@ -81,9 +79,9 @@ int main() {
 	}
 
 	//CHECK IF MEMORY HAS BEEN ALLOCATED
-	ptrA = (long double*)malloc(((long double)arrA.columns * arrA.rows) * sizeof(long double));
-	ptrB = (long double*)malloc(((long double)arrB.columns * arrB.rows) * sizeof(long double));
-
+	ptrA = (long double*)_aligned_malloc(((long double)arrA.columns * arrA.rows) * sizeof(long double), sizeof(long double));
+	ptrB = (long double*)_aligned_malloc(((long double)arrB.columns * arrB.rows) * sizeof(long double), sizeof(long double));
+	ptrC = (long double*)_aligned_malloc(((long double)arrA.rows * arrB.columns) * sizeof(long double), sizeof(long double));
 
 	// FILL ARRAYS  WITH INPUT FILE DATA 
 	//Array A
@@ -95,16 +93,16 @@ int main() {
 		int elementA_count = arrA.columns * arrA.rows;
 		int numElementsA;
 		int i = 0;
-		printf("How many do elements you want to read for array A? ");
-		scanf_s("%d", &numElementsA);
+		//printf("How many do elements you want to read for array A? ");
+		//scanf_s("%d", &numElementsA);
 
-		/* CHECK IF ARRAY SIZE CAN STORE NUMBER OF ELEMENTS THAT USER DESIRES TO READ*/
-		if (elementA_count != numElementsA) {
-			printf("Size of the array doesn't match with the number of elements desired to read");
-			exit(EXIT_FAILURE);
-		}
+		///* CHECK IF ARRAY SIZE CAN STORE NUMBER OF ELEMENTS THAT USER DESIRES TO READ*/
+		//if (elementA_count != numElementsA) {
+		//	printf("Size of the array doesn't match with the number of elements desired to read");
+		//	exit(EXIT_FAILURE);
+		//}
 
-		/READ FILE AND STORE EACH ELEMENT IN THE CORRESPONDING ARRAY/
+		//READ FILE AND STORE EACH ELEMENT IN THE CORRESPONDING ARRAY/
 		while (i < elementA_count) {
 			if (feof(FileA)) {
 				printf("Number of elements in the file are less than the desired number of elements");
@@ -125,14 +123,14 @@ int main() {
 		int numElementsB;
 		int i = 0;
 
-		printf("How many do elements you want to read for array B? ");
-		scanf_s("%d", &numElementsB);
+		//printf("How many do elements you want to read for array B? ");
+		//scanf_s("%d", &numElementsB);
 
-		/* CHECK IF ARRAY SIZE CAN STORE NUMBER OF ELEMENTS THAT USER DESIRES TO READ*/
-		if (elementB_count != numElementsB) {
-			printf("Size of the array doesn't match with the number of elements desired to read");
-			exit(EXIT_FAILURE);
-		}
+		///* CHECK IF ARRAY SIZE CAN STORE NUMBER OF ELEMENTS THAT USER DESIRES TO READ*/
+		//if (elementB_count != numElementsB) {
+		//	printf("Size of the array doesn't match with the number of elements desired to read");
+		//	exit(EXIT_FAILURE);
+		//}
 		while (i < elementB_count) {
 			if (feof(FileB)) {
 				printf("Number of elements in the file are less than the desired number of elements");
@@ -143,33 +141,42 @@ int main() {
 		}
 	}
 
-	/TRANSPOSE ARR_B AND STORE IN NEW MEMORY BLOCK/
+	//TRANSPOSE ARR_B AND STORE IN NEW MEMORY BLOCK/
 	ptrB_aux = matrixTransposition(arrB, ptrB);
 
-	//if (ptrB) {
-	//	for (int i = 0; i < arrB.rows; i++) {
-	//		for (int j = 0; j < arrB.columns; j++) {
-	//			printf("%0.12f  \t", ptrB[i * arrB.columns + j]);
-	//		}
-	//		printf("\n");
-	//	}
-	//}
-	//printf("\n");
+	//Limpiar memoria 
+	memset(ptrC, 0, sizeof(ptrC[0]) * arrC.columns * arrC.rows);
 
-	free(ptrB);
-
-	//PRINT VALUES INSIDE ARRAYS
-	if (ptrA) {
-		for (int i = 0; i < arrA.rows; i++) {
-			for (int j = 0; j < arrA.columns; j++) {
-				printf("%0.12f  \t", ptrA[i * arrA.columns + j]);
+	//MATRIX MULTIPLICATION
+	int aux = 0;
+	for (int i = 0; i < arrA.rows; i++) {
+		for (int j = 0; j < arrB.columns; j++) {
+			for (int k = 0; k < arrA.columns; k++) {
+				ptrC[aux] += ptrA[k + i * arrA.columns] * ptrB_aux[k + j * arrB.rows];
+				//printf("%0.12f \n", ptrA[k + i * arrA.columns]);
+				//printf("%0.12f \n", ptrB_aux[k + j * arrB.rows]);
 			}
-		printf("\n");
+			aux++;
 		}
 	}
 
-	printf("\n\n");
 
-	free(ptrA);
+	_aligned_free(ptrB);
+	_aligned_free(ptrA);
+
+	FILE* FileC = fopen("matrizC.txt", "w");
+
+	//PRINT VALUES OF RESULT ARRAY
+	if (ptrC) {
+		for (int i = 0; i < arrA.rows; i++) {
+			for (int j = 0; j < arrB.columns; j++) {
+				//printf("%0.10f  \t", ptrC[i * arrC.columns + j]);
+				//fwrite(ptrC[i * arrC.columns + j], sizeof(long double), 1, FileC); 
+				fprintf(FileC, "%0.12f \n", ptrC[i * arrC.columns + j]);
+			}
+		}
+	}
+	_aligned_free(ptrC);
+	_aligned_free(ptrB_aux);
 	return 0;
 }
